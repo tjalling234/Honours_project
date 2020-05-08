@@ -5,4 +5,7 @@ Honours_project
 This module calculates the derivative for relevant Markov chain measures
 
 ###Constraints###
-This module gives methods to 
+This module gives methods to add constraints as a penalty to the objective
+
+###Heuristics###
+This

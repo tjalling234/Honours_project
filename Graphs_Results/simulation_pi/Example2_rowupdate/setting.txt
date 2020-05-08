@@ -1,0 +1,10 @@
+-Example is Courtois from Joost Berkhout's code
+-Update is done for entire theta row
+-Epsilon is initially chosen fixed at 0.1 and N=3000
+ -> Used many 'boosts' check desktop graph
+-There is no (special) stopping condition, the algorithm stops after N iterations
+
+
+Note:
+
+Idea: Show progress of max in every 5-10 iterations

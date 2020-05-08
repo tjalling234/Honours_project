@@ -1,0 +1,4 @@
+This simulation for entire vector update and penalty gamma*log(M_max) with gamma = ... works for r=...
+
+
+For entire vector update and penalty M_max does not seem to work. Different trials and choices for epsilon all make that the algorithm is moving what seems like a local optimal.  Even some of the local optima are where the self probability is small and some other probability is large.  

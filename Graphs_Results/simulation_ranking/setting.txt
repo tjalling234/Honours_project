@@ -1,0 +1,17 @@
+Courtois:
+-For some quick trials both vector and single update for theta work well. However, the vector update ends with a (more than tenfold) larger perturbation than the single update. For now I used fixed epsilon which works good. The smaller the epsilon choice the smaller the final perturbation to P[r] will be, but number of iterations required significantly increases.
+-Epsilon=0.001 and N=750 and r=3: Single delta = 0.0004464 vs row delta = 0.0027383, and single iterations = 8 vs row interations = 4.
+
+-Epsilon=0.25 (seemingly no/slow convergence for larger eps) and N=750 and r=2: Single delta = 0.6465213 vs row delta = 0.6103786, and single iterations = 46 vs row interations = 37.
+-Epsilon=0.1 and N=750 and r=2: Single delta = 0.6502915 vs row delta = 0.5622824, and single iterations = 117 vs row interations = 90.
+-Epsilon=0.05 and N=750 and r=2: Single delta = 0.6422651 vs row delta = 0.5637871, and single iterations = 234 vs row interations = 180.
+-For epsilon=0.01 and N=1500 and r=2: Single delta = 0.6394202 vs row delta = 0.5627879, and single iterations = 1171 vs row interations = 899.
+----> From these four simulations on r=2 we can see that the choice of epsilon does not ----> affect the final delta significantly. However, it does increase num. of iterations.
+
+
+
+-Try plot epsilon vs final norm perturbation for different epsilon. Do this for both vector update and single update.
+ 
+
+Note: Again it seems that for increasing r the number of iterations increase, but this relies on more than just large r. 
+

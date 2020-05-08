@@ -1,0 +1,22 @@
+#####PROGRAMMING#####
+TODOS:
+-Parallelise: Make sure that the simulation method returns the final process of the algorithm. Then, let this simulation module work for N iterations. Use a different py file to call this modules, which should allow for easier parallelisation. If these steps are done for all simulation files, then all simulations can easily be called from a central py file. Preventing all files from requiring a parallelisation procedure. 
+OR/PERHAPS: using yield could also allow for easier parallelisation.
+
+-Get pygraphviz module working
+
+-Make most functions compatible with multi-chains. This can be done by letting the optimization depend on some initial mu vector, so that pi remains unique.
+
+-Let Theta be constructed so that the user can choose which p_ij value depends on a single angle
+
+
+NOTES:
+-Maybe instead of giving the P matrix to each function, we can give the MC to each function. This way the MarkovChain function is not calculated again several times. Does this really improve (quicken) anything?
+
+-Adjustments to MarkovChain package:
+	-Added '()' to all print statements
+	-In tools.py changed '\\data\\' to '/data/' 
+	-In Markov_chain_new 'import util' was used, but I needed (in accordance with sys.path) from Markov_chain import util. Simillarly for tools
+
+
+#####READING#####

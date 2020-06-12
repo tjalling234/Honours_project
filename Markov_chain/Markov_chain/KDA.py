@@ -299,25 +299,25 @@ if __name__ == "__main__":
     # KDA1 = KDA(MC)
     #
     KDA2 = KDA(MC, CO_A='CO_A_3(3)', CO_B='CO_B_1(3)', SC=True)
-    print KDA2.MC
+    print (KDA2.MC)
 
     KDA3 = KDA(MC, CO_A='CO_A_1(1)', CO_B='CO_B_3(0)', SC=True)
-    print KDA3.MC
+    print (KDA3.MC)
 
     KDA3a = KDA(MC, CO_A='CO_A_2(2)', CO_B='CO_B_1(1)', SC=True)
-    print KDA3a.MC
+    print (KDA3a.MC)
 
     KDA3b = KDA(MC, CO_A='CO_A_2(3)', CO_B='CO_B_1(1)', SC=True)
-    print KDA3b.MC
+    print (KDA3b.MC)
 
     MCCourtois = MarkovChain('Courtois', verbose=True)
     KDA4 = KDA(MCCourtois, CO_A='CO_A_2(3)', CO_B='CO_B_1(1)')
-    print KDA4.MC
-    print KDA4.cutLog['edgesCut']
+    print (KDA4.MC)
+    print (KDA4.cutLog['edgesCut'])
 
     KDA5 = KDA(MCCourtois, CO_A='CO_A_1(1)', CO_B='CO_B_3(0)')
-    print KDA5.MC
-    print KDA5.MC.P - KDA4.MC.P
+    print (KDA5.MC)
+    print (KDA5.MC.P - KDA4.MC.P)
 
     KDA6 = KDA(MCCourtois, CO_A='CO_A_1(2)', CO_B='CO_B_1(2)')
     KDA7 = KDA(MCCourtois, CO_A='CO_A_3(3)', CO_B='CO_B_1(1)')
@@ -325,9 +325,9 @@ if __name__ == "__main__":
     # KDA.MC.draw()
 
     KDAORArticleFig4 = KDA(MC, CO_A='CO_A_1(1)', CO_B='CO_B_3(0)', SC=False)
-    print 'Figure 4 of OR article correponds to:'
-    print KDAORArticleFig4.MC
-    print KDAORArticleFig4.MC.ec + KDAORArticleFig4.MC.tc
+    print ('Figure 4 of OR article correponds to:')
+    print (KDAORArticleFig4.MC)
+    print (KDAORArticleFig4.MC.ec + KDAORArticleFig4.MC.tc)
 	
 	
     # Test with old implementation
@@ -341,14 +341,14 @@ if __name__ == "__main__":
                                    np.sum((KDerOld*(P>0)) < 0),
                                    False)
     KDA1 = KDA(MC, CO_A='CO_A_1(1)', CO_B='CO_B_3(0)', SC=False, verbose=False)
-    print la.norm(PCutOld - KDA1.MC.P)
+    print (la.norm(PCutOld - KDA1.MC.P))
 
     PCutOld = MCOld.Kemeny_cutting(P,
                                    KDerOld,
                                    np.sum((KDerOld*(P>0)) < 0),
                                    True)
     KDA1 = KDA(MC, CO_A='CO_A_1(1)', CO_B='CO_B_3(0)', SC=True, verbose=False)
-    print la.norm(PCutOld - KDA1.MC.P)
+    print (la.norm(PCutOld - KDA1.MC.P))
 
     N = 15  # nr. of edges to cut
     PCutOld = MCOld.Kemeny_cutting(P,
@@ -356,7 +356,7 @@ if __name__ == "__main__":
                                    N,
                                    False)
     KDA1 = KDA(MC, CO_A='CO_A_1(1)', CO_B='CO_B_1({})'.format(N), SC=False, verbose=False)
-    print la.norm(PCutOld - KDA1.MC.P)
+    print (la.norm(PCutOld - KDA1.MC.P))
 
     KDA7.plot()
     KDA8.plot()

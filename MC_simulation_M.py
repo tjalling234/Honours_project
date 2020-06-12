@@ -15,13 +15,14 @@ We try both entire row update and single element update. Also, we try different 
 
 from MC_derivative import *
 from MC_constraints import *
+import MC_simulation_pi 
 from Markov_chain.Markov_chain_new import MarkovChain
 import numpy as np
 import time
 from matplotlib import pyplot as plt
 import copy
 
-def plotThetaprocess(mTheta_changes, mStatDist_changes, vObj_changes, vPr_changes, step_nr, r):
+def plotThetaprocess(mTheta_changes, vTheta_size, vDerivJ_size, mStatDist_changes, vObj_changes, vPr_changes, step_nr, r):
     N, n = mStatDist_changes.shape
 
     for c in range(n-1):
@@ -50,6 +51,20 @@ def plotThetaprocess(mTheta_changes, mStatDist_changes, vObj_changes, vPr_change
     plt.savefig('Graphs_Results/simulation_M/Kesten/fig_P_%d' % (r))
     plt.show()
 
+    plt.figure(1)
+    plt.plot(vDerivJ_size[:step_nr+1], label=r'||$\nabla J$||')
+    plt.title('Progress of derivative norm')
+    plt.legend()
+    #plt.savefig('Graphs_Results/simulation_pi/fig_derivJ_%d' % (r))
+    plt.show()
+
+    plt.figure(2)
+    plt.plot(vTheta_size[:step_nr+1], label=r'||$\theta$||')
+    plt.title('Progress of theta row')
+    plt.legend()
+    #plt.savefig('Graphs_Results/simulation_pi/fig_theta_%d' % (r))
+    plt.show()
+
 def stop_condition1(pi_old, pi_new, r):
     '''
     True if ranking of state r has improved, False otherwise.
@@ -74,11 +89,15 @@ def objJ(Theta, r, gamma):
     Output:
         J - real number, the objective value
     '''
+    n,_ = Theta.shape
     MC = MarkovChain(toP(Theta))
     pi = MC.pi[0]
     M = MC.M
+    K= 10**5
+    pen1 = np.max(M[:,r] - np.ones(n)*K,0)
+    pen2 = np.max(M[r,:] - np.ones(n)*K,0)
 
-    return pi[r] - gamma*(max(np.max(M[r]), np.max((M[:,r])), 1))
+    return pi[r] - gamma*(euclidean(pen1, np.zeros(n)) + euclidean(pen2,np.zeros(n))) #gamma*sum(sum(M))   #gamma*(max(np.max(M[r]), np.max((M[:,r])), 1))
 
 def deriv_objJ(Theta, r, c, gamma):
     '''
@@ -92,10 +111,15 @@ def deriv_objJ(Theta, r, c, gamma):
     Output:
         derivJ - real number, the derivative of the objective value
     '''
+    n,_ = Theta.shape
     deriv_pi = derivative_pi(Theta, r, c)
     derivM = derivativeM(Theta,r,c)
+    K = 10**5
+    
+    pen1 = np.max(derivM[:,r] - np.ones(n)*K,0)
+    pen2 = np.max(derivM[r,:] - np.ones(n)*K,0)
 
-    return deriv_pi[r] - gamma*(max(np.max(derivM[r]), np.max((derivM[:,r])), 1))
+    return deriv_pi[r] - gamma*(euclidean(pen1, np.zeros(n)) + euclidean(pen2,np.zeros(n)))  #10*gamma*sum(sum(derivM))   #gamma*(max(np.max(derivM[r]), np.max((derivM[:,r])), 1))
 
 def simulation(Theta, r, epsilon, gamma, N):
     '''
@@ -106,6 +130,8 @@ def simulation(Theta, r, epsilon, gamma, N):
     P_old = P
     n,_ = P.shape
     mTheta_changes = np.zeros((N,n-1))
+    vTheta_size = np.zeros((N,1))
+    vDerivJ_size = np.zeros((N,1))
     mStatDist_changes = np.zeros((N,n))
     vObj_changes = np.zeros(N)
     vPr_changes = np.zeros(N)
@@ -116,20 +142,23 @@ def simulation(Theta, r, epsilon, gamma, N):
 
     for step_nr in range(N):
         v_gradJ = np.zeros(n-1)    #store derivJ for all Theta[r,.] angles
+        v_gradJ_pi = np.zeros(n-1)    #store derivJ for all Theta[r,.] angles
         for c in range(n-1):    #c represents angle index
             derivJ = deriv_objJ(Theta,r, c, gamma)
+            v_gradJ_pi[c] = MC_simulation_pi.deriv_objJ(Theta,r, c, gamma)
             v_gradJ[c] = derivJ
         Theta[r] = Theta[r] + epsilon*v_gradJ
         #c_max = np.argmax(abs(v_gradJ))
         #Theta[r,c_max] = Theta[r,c_max] + epsilon*v_gradJ[c_max]
         #Update gain sequence
-        if ((Theta[r] - theta_1)@(theta_1 - theta_2) < 0):
+        if ((Theta[r] - theta_1)@(theta_1 - theta_2) < 0) and (step_nr>1): 
             epsilon = epsilon*0.8
         if (step_nr == 0):
             theta_1 = copy.deepcopy(Theta[r])
         else:
             theta_2 = copy.deepcopy(theta_1)
             theta_1 = copy.deepcopy(Theta[r])
+        
         #Update MC measures
         P = toP(Theta)
         pi = stationaryDist(Theta, None)
@@ -138,22 +167,9 @@ def simulation(Theta, r, epsilon, gamma, N):
         mStatDist_changes[step_nr] = pi
         vObj_changes[step_nr] = objJ(Theta, r, gamma)
         mTheta_changes[step_nr] = Theta[r]
+        vTheta_size[step_nr] = euclidean(Theta[r], np.zeros(n-1))
+        vDerivJ_size[step_nr] = euclidean(v_gradJ, np.zeros(n-1))
         vPr_changes[step_nr] = P[r,r]
-
-
-        '''
-        if (v_gradJ[c_max] < 0): 
-            momentum[step_nr % M] = -1
-        else: 
-            momentum[step_nr % M] = 1
-        #Update rule, based on momentum
-        #if (sum(momentum) == M or sum(momentum) == -M): #M times the same direction: SPEED UP
-        #    epsilon = epsilon*1.1
-        #    momentum = np.zeros(M)
-        if (momentum[step_nr % M]*momentum[(step_nr-1) % M] == -1): #consecutive directions are different: SLOW DOWN
-            epsilon = epsilon*0.9
-            #momentum = np.zeros(M)
-        '''
 
         print ('==========')
         print ('epsilon=', epsilon)
@@ -161,8 +177,11 @@ def simulation(Theta, r, epsilon, gamma, N):
         print ('pi_new', np.round(pi,4))
         print ('P[r]=', np.round(P[r],3))
         print ('Obj=', np.round(vObj_changes[step_nr],3))
+        print ('Gradient=', np.round(v_gradJ,3))
+        print ('Gradient pi=', np.round(v_gradJ_pi,3))
         print ('==========')
-    plotThetaprocess(mTheta_changes, mStatDist_changes, vObj_changes, vPr_changes, step_nr, r)
+
+    plotThetaprocess(mTheta_changes, vTheta_size, vDerivJ_size, mStatDist_changes, vObj_changes, vPr_changes, step_nr, r)
 
 def start():
     print ("===============================================================")
@@ -176,18 +195,13 @@ def start():
     #MC = MarkovChain(P)
     r = 1   #0,1,..,n-1 The state for which the stationary distribution will be maximized
     #c = 5 #0, 1, .., n-2
+    #P[r]= [0., 0.972, 0.028, 0., 0., 0., 0., 0.]
     Theta = toTheta(P)
-    epsilon = 0.1 
-    gamma = 10**-6
-    N = 50   #Number of iterations
-
+    epsilon = 0.001
+    gamma = 10**-7
+    N = 1000   #Number of iterations
+    
     #Start
-    #print ('###########')
-    #print ('First stationary probabilities:\n', MC.pi[0])
-    #print ('First Objective value:', objJ(Theta,r,gamma))
-    #print ('First transition probabilities:\n', np.round(MC.P,3))
-    #print ('First M value:\n', np.round(MC.M*gamma,2))
-    #for r in range(8):
     simulation(Theta, r, epsilon, gamma, N)
     
     #Running time

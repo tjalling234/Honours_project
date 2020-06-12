@@ -113,9 +113,17 @@ def simulation(Theta, r, epsilon, subset, gamma, psi, N):
         for c in range(n-1):    #c represents angle index
             derivJ = deriv_objJ(Theta, r, c, subset, gamma, psi, Theta_ini)
             v_gradJ[c] = derivJ
-        #Theta[r] = Theta[r] + epsilon*v_gradJ
-        c_max = np.argmax(abs(v_gradJ))
-        Theta[r,c_max] = Theta[r,c_max] + epsilon*v_gradJ[c_max]
+        Theta[r] = Theta[r] + epsilon*v_gradJ
+        #c_max = np.argmax(abs(v_gradJ))
+        #Theta[r,c_max] = Theta[r,c_max] + epsilon*v_gradJ[c_max]
+        #Update gain sequence
+        if ((Theta[r] - theta_1)@(theta_1 - theta_2) < 0):
+            epsilon = epsilon*0.9
+        if (step_nr == 0):
+            theta_1 = copy.deepcopy(Theta[r])
+        else:
+            theta_2 = copy.deepcopy(theta_1)
+            theta_1 = copy.deepcopy(Theta[r])
         #Update MC measures
         P = toP(Theta)
         pi = stationaryDist(Theta, None)
@@ -126,21 +134,6 @@ def simulation(Theta, r, epsilon, subset, gamma, psi, N):
         mTheta_changes[step_nr] = Theta[r]
         vPr_changes[step_nr] = P[r,r]
 
-
-        '''
-        if (v_gradJ[c_max] < 0): 
-            momentum[step_nr % M] = -1
-        else: 
-            momentum[step_nr % M] = 1
-        #Update rule, based on momentum
-        #if (sum(momentum) == M or sum(momentum) == -M): #M times the same direction: SPEED UP
-        #    epsilon = epsilon*1.1
-        #    momentum = np.zeros(M)
-        if (momentum[step_nr % M]*momentum[(step_nr-1) % M] == -1): #consecutive directions are different: SLOW DOWN
-            epsilon = epsilon*0.9
-            #momentum = np.zeros(M)
-        '''
-
         print ('==========')
         print ('epsilon=', epsilon)
         print ('iteration=', step_nr)
@@ -148,8 +141,7 @@ def simulation(Theta, r, epsilon, subset, gamma, psi, N):
         print ('pi_new', np.round(pi,4))
         print ('P[r]=', np.round(P[r],3))
         print ('Obj=', np.round(vObj_changes[step_nr],3))
-        print ('momentum', momentum)
-        print ('Maximum value in gradient', v_gradJ[c_max])
+       # print ('Maximum value in gradient', v_gradJ[c_max])
         print ('==========')
         
     print ('Final Objective value:', round(objJ(Theta, r, subset, gamma, psi, Theta_ini),3))
@@ -173,10 +165,10 @@ def start():
     Theta = toTheta(P)
     epsilon = 0.1  #Epsilon = 0.005 and update (>200) epsilon decreasing factor with factor 10 worked for all r in example Courtois
     gamma = 10**-6
-    N = 500    #Number of iterations
+    N = 300    #Number of iterations
     
-    subset = [2]
-    psi = 2
+    subset = [0]
+    psi = 3
 
     simulation(Theta, r, epsilon, subset, gamma, psi, N)
     

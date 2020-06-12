@@ -1,4 +1,0 @@
--Example is P[i,j]=1/n for all i,j
--Update is done for entire theta row
--Epsilon is chosen fixed at 0.05 and N=200
--There is no (special) stopping condition, the algorithm stops after N iterations

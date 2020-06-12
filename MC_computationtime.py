@@ -22,7 +22,7 @@ def grad_pi_r(Theta, r):
 start_time = time.time()
 N = 200
 n = 6
-r = 3
+r = 
 P = np.ones((n,n))/n
 Theta = toTheta(P)
 theta_rc = np.sort(np.random.uniform(low=0.0,high=np.pi/2,size=N))

@@ -163,8 +163,10 @@ def derivative_pi(Theta, r, c):
     pi = MC.pi[0]
     D = MC.D
     deriv_P = derivativeP(Theta, r, c)
+    #deriv_P = np.zeros((n,n))
+    #deriv_P[r,c] = 1.0
     deriv_pi = pi @ deriv_P @ D
-    
+
     return deriv_pi
 
 def derivativePi(Theta, r ,c):

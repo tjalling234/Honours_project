@@ -1,0 +1,20 @@
+A problem we encounter for the fix epsilon case of our algorithm is the following: We see that 
+our objective function is increasing in every step of the algorithm until step n. After step 
+n our objective function keeps decreasing for a m sequential steps until it get stuck 
+on a final objective value, after the algorithm gets stuck, it start alternating between 2 
+theta coordinates with the same derivative but only a sign difference. 
+
+We give an explenation for the phenomenon using a 3 dimensional example. 
+
+Suppose we have an optimum localtion Theta* with a non-symmetric neighbourhood w.r.t. to 
+te derivatives. So it can be that if we take a level set K(x)={ theta | J(theta)=x}, then we 
+that J'(theta_1) does not need to equal J'(theta_2) for theta_1, theta_2 in K(x). 
+
+Let our decreasing sequence of theta's be (theta_1, theta_2, theta_3,... theta_n) at the end of our 
+alogorithm. Our first decreasing step occurs because near the optimum our gradient became to large '
+in terms of the norm and it jumps over the optimum into a steeper region of the neigbourhood
+(steeper wrt the gradient) and our objective value decreases, because our epsilon is fixed and we now have steeper derivative 
+in the next update, our algorithm jumps even further over the optimum and our objective value 
+decreases again. This process keeps repeating itself until gets to a point where it finds 2 points 
+with the same derivative and keeps jumping between those points.
+ 

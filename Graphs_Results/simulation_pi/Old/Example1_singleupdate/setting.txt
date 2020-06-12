@@ -1,0 +1,7 @@
+-Example is P[i,j]=1/n for all i,j
+-Update is done for a single theta element
+-Epsilon is chosen fixed at 0.1 and N=500
+-There is no (special) stopping condition, the algorithm stops after N iterations
+
+Note: 
+increasing epislon will quicken the process up to a point were it no longer converges, decreasing epsilon (1/iter) is much slower, a combi could work better.
